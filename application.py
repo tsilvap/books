@@ -23,11 +23,13 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
 def index():
-    return "Project 1: TODO"
+    return render_template("index.html.j2")
+
 
 @app.route("/register")
 def register():
     return render_template("register.html.j2")
+
 
 @app.route("/login")
 def login():

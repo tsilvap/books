@@ -1,4 +1,9 @@
 html,
-body {
+body,
+.root {
   height: 100%;
+}
+
+.content {
+  padding: 0 1.5em;
 }

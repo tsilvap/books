@@ -1,0 +1,27 @@
+{% extends "layout.html.j2" %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
+{% block body %}
+  <div class="row flex-grow-1 align-self-center">
+    <div class="col-12 col-lg-8 mx-auto darker-bg">
+      <form action="{{ url_for('index') }}" method="post">
+        <div class="form-group">
+          <label for="search">Search for ISBN, title or author</label>
+            <div class="input-group">
+              <input type="text"
+                     class="form-control"
+                     id="search"
+                     name="search"
+                     placeholder="ISBN / Title / Author">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+              </div>
+            </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

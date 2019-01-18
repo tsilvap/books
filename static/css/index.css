@@ -1,0 +1,11 @@
+.root {
+  background-image: url('../images/bookshelf.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.darker-bg {
+  background-color: white;
+  border-radius: 10px;
+  padding-top: 0.5em;
+}
