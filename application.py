@@ -82,8 +82,14 @@ def register_user(username, email, password):
 # Routes
 @app.route("/")
 def index():
-    """Index page."""
-    return render_template("index.html.j2")
+    """Index / search page."""
+    return render_template("index.html")
+
+
+@app.route("/search/<search_term>")
+def search():
+    """Search results page."""
+    pass
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -109,10 +115,10 @@ def register():
 
             return redirect(url_for("register"))
 
-    return render_template("register.html.j2")
+    return render_template("register.html")
 
 
 @app.route("/login")
 def login():
     """Login page."""
-    return render_template("login.html.j2")
+    return render_template("login.html")
