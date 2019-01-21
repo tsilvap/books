@@ -4,8 +4,6 @@
   background-position: center;
 }
 
-.darker-bg {
-  background-color: white;
-  border-radius: 10px;
-  padding-top: 0.5em;
+.card-isbn {
+  font-size: 0.5em;
 }

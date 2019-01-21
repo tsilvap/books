@@ -29,6 +29,25 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
 # Helper functions
+def get_search_results(search_term):
+    """Get books from database based on a search term.
+
+    Return all books that contain search_term in their ISBN, author name
+    or title, regardless of letter case.
+    """
+    results = db.execute(
+        """
+        SELECT * FROM books WHERE
+            lower(isbn) LIKE :search_term
+            OR lower(author) LIKE :search_term
+            OR lower(title) LIKE :search_term
+        """,
+        {"search_term": f"%{search_term.lower()}%"},
+    ).fetchall()
+
+    return results
+
+
 def username_already_in_use(username):
     """Return whether username is already in use."""
     username_in_database = db.execute(
@@ -83,13 +102,14 @@ def register_user(username, email, password):
 @app.route("/")
 def index():
     """Index / search page."""
-    return render_template("index.html")
+    search_term = request.args.get("q")
+    results = None
+    if search_term:
+        results = get_search_results(search_term)
+        for result in results:
+            print(type(result))
 
-
-@app.route("/search/<search_term>")
-def search():
-    """Search results page."""
-    pass
+    return render_template("index.html", results=results)
 
 
 @app.route("/register", methods=["GET", "POST"])
