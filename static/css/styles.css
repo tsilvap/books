@@ -1,9 +1,14 @@
 html,
 body,
 .root {
+  background-image: url('../images/bookshelf.jpg');
+  background-size: cover;
+  background-position: center;
   height: 100%;
+  overflow: hidden;
 }
 
 .content {
   padding: 0 1.5em;
+  min-height: 1px; /* Firefox bug */
 }

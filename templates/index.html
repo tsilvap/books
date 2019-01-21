@@ -31,23 +31,25 @@
     </div> <!-- Close row -->
 
     {% if results %}
-      {% for result in results %}
-        <div class="row">
-          <div class="col-12 col-lg-8 mx-auto pt-2">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">
-                  {{ result['title'] }} <small class="card-isbn text-muted">ISBN {{ result['isbn'] }}</small>
-                </h5>
-                <div class="card-subtitle text-muted mb-3">
-                  by {{ result['author'] }} ({{ result['year'] }})
+      <div class="results col-12 col-lg-8 mx-auto">
+        {% for result in results %}
+          <div class="row">
+            <div class="col-12 mx-auto pt-2">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    {{ result['title'] }} <small class="card-isbn text-muted">ISBN {{ result['isbn'] }}</small>
+                  </h5>
+                  <div class="card-subtitle text-muted mb-3">
+                    by {{ result['author'] }} ({{ result['year'] }})
+                  </div>
+                  <a href="#" class="btn btn-primary">View book</a>
                 </div>
-                <a href="#" class="btn btn-primary">View book</a>
               </div>
             </div>
           </div>
-        </div>
-      {% endfor %}
+        {% endfor %}
+      </div>
     {% endif %}
 
   </div>
