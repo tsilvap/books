@@ -106,8 +106,6 @@ def index():
     results = None
     if search_term:
         results = get_search_results(search_term)
-        for result in results:
-            print(type(result))
 
     return render_template("index.html", results=results)
 
