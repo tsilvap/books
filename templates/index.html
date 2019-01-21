@@ -1,56 +1,52 @@
 {% extends "layout.html" %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 {% endblock %}
 
 {% block body %}
-  {% if results %}
-    <div class="row">
+{% if results %}
+<div class="row">
   {% else %}
-    <div class="row align-items-center h-100">
-  {% endif %}
-
-      <div class="col-12 col-lg-8 mx-auto card pt-2 mt-2">
-        <form action="{{ url_for('index') }}" method="get">
-          <div class="form-group">
-            <label for="search">Search for ISBN, title or author</label>
-              <div class="input-group">
-                <input type="text"
-                        class="form-control"
-                        id="search"
-                        name="q"
-                        placeholder="ISBN / Title / Author">
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
-                </div>
-              </div>
-          </div>
-        </form>
-      </div>
-    </div> <!-- Close row -->
-
-    {% if results %}
-      <div class="results col-12 col-lg-8 mx-auto">
-        {% for result in results %}
-          <div class="row">
-            <div class="col-12 mx-auto pt-2">
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="card-title">
-                    {{ result['title'] }} <small class="card-isbn text-muted">ISBN {{ result['isbn'] }}</small>
-                  </h5>
-                  <div class="card-subtitle text-muted mb-3">
-                    by {{ result['author'] }} ({{ result['year'] }})
-                  </div>
-                  <a href="#" class="btn btn-primary">View book</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
+  <div class="row align-items-center h-100">
     {% endif %}
 
+    <div class="col-12 col-lg-8 mx-auto card pt-2 mt-2">
+      <form action="{{ url_for('index') }}" method="get">
+        <div class="form-group">
+          <label for="search">Search for ISBN, title or author</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="search" name="q" placeholder="ISBN / Title / Author">
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div> <!-- Close row -->
+
+  {% if results %}
+  <div class="results col-12 col-lg-8 mx-auto">
+    {% for result in results %}
+    <div class="row">
+      <div class="col-12 mx-auto pt-2">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              {{ result['title'] }} <small class="card-isbn text-muted">ISBN {{ result['isbn'] }}</small>
+            </h5>
+            <div class="card-subtitle text-muted mb-3">
+              by {{ result['author'] }} ({{ result['year'] }})
+            </div>
+            <a href="{{ url_for('book', isbn=result['isbn']) }}" class="btn btn-primary">View book</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
   </div>
+  {% endif %}
+
+</div>
 {% endblock %}

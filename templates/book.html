@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="row">
+  <div class="col-12 col-lg-8 mx-auto mt-2">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+
+          <div class="book-info">
+            <div class="mb-2">IBSN {{ book['isbn'] }}</div>
+            <h5 class="card-title">{{ book['title'] }}</h5>
+            <div class="card-subtitle text-muted mb-3">
+              by {{ book['author'] }} ({{ book['year'] }})
+            </div>
+          </div>
+
+          <div class="goodreads-data">
+            <h5>Goodreads average rating:</h5>
+            <h5>Number of ratings:</h5>
+          </div>
+
+        </div>
+
+        <div class="user-reviews">
+          <h5>User reviews:</h5>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

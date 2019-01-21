@@ -48,6 +48,15 @@ def get_search_results(search_term):
     return results
 
 
+def get_book_by_isbn(isbn):
+    """Return books row from database corresponding to a given isbn."""
+    result = db.execute(
+        "SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn": isbn.lower()}
+    ).fetchone()
+
+    return result
+
+
 def username_already_in_use(username):
     """Return whether username is already in use."""
     username_in_database = db.execute(
@@ -110,6 +119,16 @@ def index():
     return render_template("index.html", results=results)
 
 
+@app.route("/book/<string:isbn>")
+def book(isbn):
+    """Book page."""
+    book = get_book_by_isbn(isbn)
+    if book is None:
+        return render_template("not_found.html"), 404
+
+    return render_template("book.html", book=book)
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register page."""
@@ -123,15 +142,14 @@ def register():
             register_user(username, email, password)
             flash("Successfully registered! You may now log in.", "success")
             return redirect(url_for("login"))
-        else:
-            if username_already_in_use(username):
-                flash(
-                    "Username already in use, please pick another.", "danger"
-                )
-            if email_already_in_use(email):
-                flash("Email already in use, please pick another.", "danger")
 
-            return redirect(url_for("register"))
+        if username_already_in_use(username):
+            flash("Username already in use, please pick another.", "danger")
+
+        if email_already_in_use(email):
+            flash("Email already in use, please pick another.", "danger")
+
+        return redirect(url_for("register"))
 
     return render_template("register.html")
 
