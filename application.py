@@ -4,6 +4,7 @@ import requests
 from flask import (
     Flask,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -66,7 +67,7 @@ def get_goodreads_data(isbn):
     )
     book = res.json()["books"][0]
 
-    return book["ratings_count"], book["average_rating"]
+    return book["ratings_count"], book["average_rating"], book["reviews_count"]
 
 
 def stars_from_rating(rating):
@@ -157,7 +158,7 @@ def book(isbn):
         return render_template("not_found.html"), 404
 
     # Get Goodreads data
-    ratings_count, average_rating = get_goodreads_data(book["isbn"])
+    ratings_count, average_rating = get_goodreads_data(book["isbn"])[0:2]
     full_stars, half_stars = stars_from_rating(average_rating)
 
     return render_template(
@@ -200,3 +201,23 @@ def register():
 def login():
     """Login page."""
     return render_template("login.html")
+
+
+@app.route("/api/<string:isbn>")
+def api(isbn):
+    """Books JSON API."""
+    book = get_book_by_isbn(isbn)
+    if book is None:
+        return render_template("not_found.html"), 404
+
+    average_rating, review_count = get_goodreads_data(book["isbn"])[1:]
+    response = {
+        "title": book["title"],
+        "author": book["author"],
+        "year": book["year"],
+        "isbn": book["isbn"],
+        "review_count": review_count,
+        "average_score": float(average_rating),
+    }
+
+    return jsonify(response)
