@@ -159,7 +159,7 @@ def get_username(email):
     """Return username for a registered email."""
     username = db.execute(
         "SELECT username FROM users WHERE email=:email", {"email": email}
-    ).fetchone()
+    ).fetchone()[0]
 
     return username
 
@@ -246,6 +246,13 @@ def login():
         return redirect(url_for("login"))
 
     return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    """Log out."""
+    session["username"] = ""
+    return redirect(url_for("index"))
 
 
 @app.route("/api/<string:isbn>")
