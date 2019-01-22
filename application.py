@@ -138,6 +138,35 @@ def register_user(username, email, password):
     db.commit()
 
 
+def valid_credentials(username_or_email, password):
+    """Return whether a user/email and password combination is valid."""
+    if "@" in username_or_email:  # email
+        user = db.execute(
+            "SELECT * FROM users WHERE email=:email AND password=:password",
+            {"email": username_or_email, "password": password},
+        ).fetchone()
+
+        return True if user else False
+
+    else:  # username
+        user = db.execute(
+            "SELECT * FROM users"
+            "WHERE username=:username AND password=:password",
+            {"username": username_or_email, "password": password},
+        ).fetchone()
+
+        return True if user else False
+
+
+def get_username(email):
+    """Return username for a registered email."""
+    username = db.execute(
+        "SELECT username FROM users WHERE email=:email", {"email": email}
+    ).fetchone()
+
+    return username
+
+
 # Routes
 @app.route("/")
 def index():
@@ -197,10 +226,31 @@ def register():
         return render_template("register.html")
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
     """Login page."""
-    return render_template("login.html")
+    if request.method == "POST":
+        username_or_email, password = (
+            str(request.form["user-or-email"]),
+            str(request.form["password"]),
+        )
+
+        if valid_credentials(username_or_email, password):
+            username = ""
+            if "@" in username_or_email:  # email
+                username = get_username(username_or_email)
+            else:
+                username = username_or_email
+
+            session["username"] = username
+            return redirect(url_for("index"))
+
+        else:
+            flash("Invalid username/email and password combination.", "danger")
+            return redirect(url_for("login"))
+
+    else:
+        return render_template("login.html")
 
 
 @app.route("/api/<string:isbn>")
