@@ -131,7 +131,7 @@ def valid_registration(username, email, password):
 def register_user(username, email, password):
     """Register a new user into the database."""
     db.execute(
-        "INSERT INTO users (username, email, password)"
+        "INSERT INTO users (username, email, password) "
         "VALUES (:username, :email, :password)",
         {"username": username, "email": email, "password": password},
     )
@@ -147,7 +147,7 @@ def valid_credentials(username_or_email, password):
         ).fetchone()
     else:  # username
         user = db.execute(
-            "SELECT * FROM users"
+            "SELECT * FROM users "
             "WHERE username=:username AND password=:password",
             {"username": username_or_email, "password": password},
         ).fetchone()
