@@ -145,9 +145,6 @@ def valid_credentials(username_or_email, password):
             "SELECT * FROM users WHERE email=:email AND password=:password",
             {"email": username_or_email, "password": password},
         ).fetchone()
-
-        return True if user else False
-
     else:  # username
         user = db.execute(
             "SELECT * FROM users"
@@ -155,7 +152,7 @@ def valid_credentials(username_or_email, password):
             {"username": username_or_email, "password": password},
         ).fetchone()
 
-        return True if user else False
+    return True if user else False
 
 
 def get_username(email):
