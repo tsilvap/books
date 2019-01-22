@@ -242,12 +242,10 @@ def login():
             session["username"] = username
             return redirect(url_for("index"))
 
-        else:
-            flash("Invalid username/email and password combination.", "danger")
-            return redirect(url_for("login"))
+        flash("Invalid username/email and password combination.", "danger")
+        return redirect(url_for("login"))
 
-    else:
-        return render_template("login.html")
+    return render_template("login.html")
 
 
 @app.route("/api/<string:isbn>")
