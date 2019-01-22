@@ -16,8 +16,18 @@
           </div>
 
           <div class="goodreads-data">
-            <h5>Goodreads average rating:</h5>
-            <h5>Number of ratings:</h5>
+            <h5>
+              Goodreads average rating:
+              <small>
+                {% for i in range(0, full_stars) %}
+                <i class="fas fa-star"></i>
+                {% endfor %}
+                {% for i in range(0, half_stars) %}
+                <i class="fas fa-star-half"></i>
+                {% endfor %}
+              </small>
+            </h5>
+            <h5>Number of ratings: <small>{{ ratings_count }}</small></h5>
           </div>
 
         </div>

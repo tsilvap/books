@@ -1,5 +1,6 @@
 import os
 
+import requests
 from flask import (
     Flask,
     flash,
@@ -49,12 +50,41 @@ def get_search_results(search_term):
 
 
 def get_book_by_isbn(isbn):
-    """Return books row from database corresponding to a given isbn."""
+    """Return books row from database corresponding to a given ISBN."""
     result = db.execute(
         "SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn": isbn.lower()}
     ).fetchone()
 
     return result
+
+
+def get_goodreads_data(isbn):
+    """Return number of ratings and average rating from Goodreads."""
+    res = requests.get(
+        "https://www.goodreads.com/book/review_counts.json",
+        params={"key": os.getenv("API_KEY"), "isbns": isbn},
+    )
+    book = res.json()["books"][0]
+
+    return book["ratings_count"], book["average_rating"]
+
+
+def stars_from_rating(rating):
+    """Return number of full and half stars corresponding to rating."""
+    rating = float(rating)  # Convert string to float
+
+    full_stars = int(rating)
+    half_stars = 0
+
+    fractional_part = rating - int(rating)
+    if 0 <= fractional_part < 0.25:
+        half_stars = 0
+    elif 0.25 <= fractional_part < 0.75:
+        half_stars = 1
+    else:
+        full_stars += 1
+
+    return full_stars, half_stars
 
 
 def username_already_in_use(username):
@@ -126,7 +156,17 @@ def book(isbn):
     if book is None:
         return render_template("not_found.html"), 404
 
-    return render_template("book.html", book=book)
+    # Get Goodreads data
+    ratings_count, average_rating = get_goodreads_data(book["isbn"])
+    full_stars, half_stars = stars_from_rating(average_rating)
+
+    return render_template(
+        "book.html",
+        book=book,
+        ratings_count=ratings_count,
+        full_stars=full_stars,
+        half_stars=half_stars,
+    )
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -138,6 +178,7 @@ def register():
             str(request.form["email"]),
             str(request.form["password"]),
         )
+
         if valid_registration(username, email, password):
             register_user(username, email, password)
             flash("Successfully registered! You may now log in.", "success")
@@ -151,7 +192,8 @@ def register():
 
         return redirect(url_for("register"))
 
-    return render_template("register.html")
+    else:
+        return render_template("register.html")
 
 
 @app.route("/login")
