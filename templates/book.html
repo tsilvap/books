@@ -23,17 +23,45 @@
                 <i class="fas fa-star"></i>
                 {% endfor %}
                 {% for i in range(0, half_stars) %}
-                <i class="fas fa-star-half"></i>
+                <i class="fas fa-star-half-alt"></i>
                 {% endfor %}
               </small>
             </h5>
             <h5>Number of ratings: <small>{{ ratings_count }}</small></h5>
           </div>
-
         </div>
 
-        <div class="user-reviews">
-          <h5>User reviews:</h5>
+        <div class="reviews">
+          <h5>Leave a review:</h5>
+          {% if not session["username"] %}
+          <p>Please <a href="{{ url_for('login') }}">log in</a> to leave a review.</p>
+          {% else %}
+          <form action="{{ url_for('book', isbn=book['isbn']) }}" method="post">
+            <div class="form-group">
+              <textarea class="form-control" name="review" placeholder="What are your thoughts on this book?" rows="3"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Submit review</button>
+          </form>
+          {% endif %}
+
+          <div class="user-reviews mt-4">
+            <h5>User reviews:</h5>
+            {% if user_reviews %}
+            <div class="list-group mt-3">
+              {% for review in user_reviews %}
+              <div class="list-group-item">
+                <div class="d-flex w-100 justify-content-between mt-2">
+                  <h5>Review by {{ review['username'] }}</h5>
+                  <small>{{ review['date'].strftime("%a, %b %d %Y at %I:%M %p") }}</small>
+                </div>
+                <p>{{ review['review'] }}</p>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p>No user reviews submitted yet.</p>
+            {% endif %}
+          </div>
         </div>
 
       </div>

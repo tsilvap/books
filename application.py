@@ -50,6 +50,19 @@ def get_search_results(search_term):
     return results
 
 
+def submit_review(username, isbn, review):
+    """Submit a review under username."""
+    if len(review) > 10000:
+        return
+
+    db.execute(
+        "INSERT INTO reviews (username, isbn, review, date) "
+        "VALUES (:username, :isbn, :review, :date)",
+        {"username": username, "isbn": isbn, "review": review, "date": "now"},
+    )
+    db.commit()
+
+
 def get_book_by_isbn(isbn):
     """Return books row from database corresponding to a given ISBN."""
     result = db.execute(
@@ -86,6 +99,15 @@ def stars_from_rating(rating):
         full_stars += 1
 
     return full_stars, half_stars
+
+
+def get_user_reviews(isbn):
+    """Get user reviews for a given book."""
+    reviews = db.execute(
+        "SELECT * FROM reviews WHERE isbn=:isbn", {"isbn": isbn}
+    ).fetchall()
+
+    return reviews
 
 
 def username_already_in_use(username):
@@ -176,9 +198,17 @@ def index():
     return render_template("index.html", results=results)
 
 
-@app.route("/book/<string:isbn>")
+@app.route("/book/<string:isbn>", methods=["GET", "POST"])
 def book(isbn):
-    """Book page."""
+    """Book / review page."""
+    if request.method == "POST":
+        username = session["username"]
+
+        if username:
+            submit_review(username, isbn, request.form["review"])
+
+        return redirect(url_for("book", isbn=isbn))
+
     book = get_book_by_isbn(isbn)
     if book is None:
         return render_template("not_found.html"), 404
@@ -187,12 +217,16 @@ def book(isbn):
     ratings_count, average_rating = get_goodreads_data(book["isbn"])[0:2]
     full_stars, half_stars = stars_from_rating(average_rating)
 
+    # Get user reviews
+    user_reviews = get_user_reviews(isbn)
+
     return render_template(
         "book.html",
         book=book,
         ratings_count=ratings_count,
         full_stars=full_stars,
         half_stars=half_stars,
+        user_reviews=user_reviews,
     )
 
 
