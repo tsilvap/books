@@ -38,9 +38,15 @@
           {% else %}
           <form action="{{ url_for('book', isbn=book['isbn']) }}" method="post">
             <div class="form-group">
-              <textarea class="form-control" name="review" placeholder="What are your thoughts on this book?" rows="3"></textarea>
+              <textarea class="form-control" name="review" placeholder="What are your thoughts on this book?" rows="3">{% if has_reviewed %}{{ user_review['review'] }}{% endif %}</textarea>
             </div>
-            <button class="btn btn-primary" type="submit">Submit review</button>
+            <button class="btn btn-primary" type="submit">
+              {% if has_reviewed %}
+              Update review
+              {% else %}
+              Submit review
+              {% endif %}
+            </button>
           </form>
           {% endif %}
 

@@ -63,6 +63,19 @@ def submit_review(username, isbn, review):
     db.commit()
 
 
+def update_review(username, isbn, review):
+    """Update a review under username."""
+    if len(review) > 10000:
+        return
+
+    db.execute(
+        "UPDATE reviews SET review=:review, date=:date "
+        "WHERE username=:username AND isbn=:isbn",
+        {"username": username, "isbn": isbn, "review": review, "date": "now"},
+    )
+    db.commit()
+
+
 def get_book_by_isbn(isbn):
     """Return books row from database corresponding to a given ISBN."""
     result = db.execute(
@@ -99,6 +112,26 @@ def stars_from_rating(rating):
         full_stars += 1
 
     return full_stars, half_stars
+
+
+def user_has_reviewed(username, isbn):
+    """Return whether user has already reviewed the book."""
+    has_reviewed = db.execute(
+        "SELECT * FROM reviews WHERE username=:username AND isbn=:isbn",
+        {"username": username, "isbn": isbn},
+    ).fetchone()
+
+    return True if has_reviewed else False
+
+
+def get_user_review(username, isbn):
+    """Return user review of a book."""
+    review = db.execute(
+        "SELECT * FROM reviews WHERE username=:username AND isbn=:isbn",
+        {"username": username, "isbn": isbn},
+    ).fetchone()
+
+    return review
 
 
 def get_user_reviews(isbn):
@@ -203,9 +236,11 @@ def book(isbn):
     """Book / review page."""
     if request.method == "POST":
         username = session["username"]
-
         if username:
-            submit_review(username, isbn, request.form["review"])
+            if not user_has_reviewed(username, isbn):
+                submit_review(username, isbn, request.form["review"])
+            else:
+                update_review(username, isbn, request.form["review"])
 
         return redirect(url_for("book", isbn=isbn))
 
@@ -220,12 +255,23 @@ def book(isbn):
     # Get user reviews
     user_reviews = get_user_reviews(isbn)
 
+    # Determine if user has already reviewed the book
+    has_reviewed = None
+    user_review = None
+    username = session["username"]
+    if username:
+        has_reviewed = user_has_reviewed(username, isbn)
+        if has_reviewed:
+            user_review = get_user_review(username, isbn)
+
     return render_template(
         "book.html",
         book=book,
         ratings_count=ratings_count,
         full_stars=full_stars,
         half_stars=half_stars,
+        has_reviewed=has_reviewed,
+        user_review=user_review,
         user_reviews=user_reviews,
     )
 
